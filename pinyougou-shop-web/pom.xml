@@ -93,6 +93,10 @@
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 
+		
+		
+		
+
 <!--阿里云OSS SDK-->
 		<dependency>
 			<groupId>com.aliyun.oss</groupId>

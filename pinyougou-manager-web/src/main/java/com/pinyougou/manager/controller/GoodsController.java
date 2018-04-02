@@ -1,18 +1,27 @@
 package com.pinyougou.manager.controller;
 
+
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.alibaba.fastjson.JSON;
 import com.pinyougou.entity.PageResult;
 import com.pinyougou.entity.Result;
-import com.pinyougou.page.service.ItemPageService;
 import com.pinyougou.pojo.TbGoods;
+import com.pinyougou.pojo.TbItem;
 import com.pinyougou.pojogroup.Goods;
 import com.pinyougou.sellergoods.service.GoodsService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.jms.core.JmsTemplate;
+import org.springframework.jms.core.MessageCreator;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.jms.Destination;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.Session;
 import java.io.File;
 import java.util.List;
 
@@ -31,9 +40,22 @@ public class GoodsController {
 	@Reference
 	private GoodsService goodsService;
 
-	@Reference
-	private ItemPageService itemPageService;
 
+
+	@Autowired
+	private Destination queueSolrDestination;
+
+	@Autowired
+	private Destination queueSolrDeleteTextDestination;
+
+	@Autowired
+	private Destination topicPageDestination;
+
+	@Autowired
+	private Destination topicPageDeleteDestination;
+
+	@Autowired
+	private JmsTemplate jmsTemplate;
 
 	/**
 	 * 返回全部列表
@@ -104,13 +126,38 @@ public class GoodsController {
      * @return
      */
 	@RequestMapping("/updateStatus")
-	public Result updateStatus(Long[] ids,String status){
+	public Result updateStatus(final Long[] ids, String status){
 		try {
+			System.out.println("aaaaa"+status);
+
 			goodsService.updateStatus(ids,status);
 			if ("1".equals(status)){
-				for (Long id : ids) {
-					itemPageService.genItemHtml(id);
+			List<TbItem> itemListByGoodsIdAndStatus = goodsService.findItemListByGoodsIdAndStatus(ids, status);
+			if (itemListByGoodsIdAndStatus.size()>0){
+				final String s = JSON.toJSONString(itemListByGoodsIdAndStatus);
+				System.out.println(s);
+				jmsTemplate.send(queueSolrDestination, new MessageCreator() {
+					@Override
+					public Message createMessage(Session session) throws JMSException {
+
+						return session.createTextMessage(s);
+					}
+				});
+			}
+
+				for (final Long id : ids) {
+
+					jmsTemplate.send(topicPageDestination, new MessageCreator() {
+						@Override
+						public Message createMessage(Session session) throws JMSException {
+							return session.createTextMessage(id+"");
+						}
+					});
 				}
+
+
+
+
 			}
 
 			return new Result(true, "修改成功");
@@ -137,16 +184,24 @@ public class GoodsController {
 	 * @return
 	 */
 	@RequestMapping("/delete")
-	public Result delete(Long [] ids){
+	public Result delete(final Long [] ids){
 		try {
-			for (Long id : ids) {
-				Goods one = goodsService.findOne(id);
-				File file=new File(pagedir+one.getGoods().getId()+".html");
-				file.delete();
-			}
+
 			goodsService.delete(ids);
 
+			jmsTemplate.send(queueSolrDeleteTextDestination, new MessageCreator() {
+				@Override
+				public Message createMessage(Session session) throws JMSException {
+					return session.createObjectMessage(ids);
+				}
+			});
 
+			jmsTemplate.send(topicPageDeleteDestination, new MessageCreator() {
+				@Override
+				public Message createMessage(Session session) throws JMSException {
+					return session.createObjectMessage(ids);
+				}
+			});
 
 			return new Result(true, "删除成功"); 
 		} catch (Exception e) {
@@ -173,10 +228,7 @@ public class GoodsController {
 	}
 
 
-	@RequestMapping("/genHtml")
-	public void genHtml(Long goodsId){
-		itemPageService.genItemHtml(goodsId);
-	}
+
 
 
 }

@@ -51,6 +51,7 @@ public class BrandServiceImpl implements BrandService {
     @Override
     public void dele(Long[] ids) {
         for (Long id:ids){
+            System.out.println(id);
             tbBrandMapper.deleteByPrimaryKey(id);
         }
     }

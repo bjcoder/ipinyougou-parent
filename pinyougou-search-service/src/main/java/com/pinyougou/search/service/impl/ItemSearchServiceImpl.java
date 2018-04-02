@@ -46,6 +46,23 @@ public class ItemSearchServiceImpl implements ItemSearchService {
 
     }
 
+    @Override
+    public void importData(List<TbItem> list) {
+       //使用saveBeans会报错
+        solrTemplate.saveBeans(list);
+        solrTemplate.commit();
+        System.out.println("同步更新到索引库");
+    }
+
+    @Override
+    public void deleteByGoodsIds(List list) {
+        Criteria item_goodsid = new Criteria("item_goodsid").in(list);
+        SimpleQuery simpleQuery = new SimpleQuery(item_goodsid);
+        solrTemplate.saveBean(simpleQuery);
+        solrTemplate.commit();
+        System.out.println("从索引库中移除删除的商品");
+    }
+
 
     public List<String> searchBrandList(Map searchMap) {
         List<String> list = new ArrayList<>();

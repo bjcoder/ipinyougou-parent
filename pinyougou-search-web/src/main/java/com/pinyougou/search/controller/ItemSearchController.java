@@ -20,6 +20,7 @@ public class ItemSearchController {
     @Reference
     private ItemSearchService itemSearchService;
 
+    //搜索页面搜索
     @RequestMapping("/search")
     public Map search(@RequestBody Map searchMap){
 

@@ -22,7 +22,8 @@ app.service('brandService',
 
         // 批量删除
         this.dele = function(ids) {
-            return $http.get('../brand/delete.do?ids=' + ids);
+
+            return $http.get('../brand/dele.do?ids=' + ids);
         }
         // 添加品牌
         this.add = function(entity) {
@@ -30,7 +31,6 @@ app.service('brandService',
         }
         // 修改品牌
         this.update = function(entity) {
-            alert(2);
             return $http.post('../brand/update.do', entity);
 
         }

@@ -18,7 +18,7 @@
 	<script type="text/javascript" src="js/controller/contentController.js"></script>
 </head>
 
-<body ng-app="pinyougou" ng-controller="contentController" ng-init="findByCategoryId('1')">
+<body ng-app="pinyougou" ng-controller="contentController" ng-init="findByCategoryId('1');showName()">
 	<!-- 头部栏位 -->
 	<!--页面顶部-->
 <div id="nav-bottom">
@@ -29,7 +29,9 @@
 				<div class="shortcut">
 					<ul class="fl">
 						<li class="f-item">品优购欢迎您！</li>
-						<li class="f-item">请<a href="../../../../../../Desktop/品优购资料（稳定版）/资源/静态原型/网站前台/login.html" target="_blank">登录</a>　<span><a href="../../../../../../Desktop/品优购资料（稳定版）/资源/静态原型/网站前台/register.html" target="_blank">免费注册</a></span></li>
+{{username}}
+						<li class="f-item" >请<a href="http://localhost:8090/cas/login?service=http://localhost:9103/index.html" >登录</a>　<span><a href="../../../../../../Desktop/品优购资料（稳定版）/资源/静态原型/网站前台/register.html" target="_blank">免费注册</a></span></li>
+
 					</ul>
 					<ul class="fr">
 						<li class="f-item">我的订单</li>

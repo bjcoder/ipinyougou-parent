@@ -62,7 +62,8 @@ app.controller('brandController', function($scope,$controller, $http, brandServi
 
     // 批量删除
     $scope.dele = function() {
-        brandService.dele($scope.selectIds).success(function(response) {
+        brandService.dele($scope.selectIds).success(
+            function(response) {
             if (response.success) {
                 $scope.reloadList();
                 $scope.selectIds = [];

@@ -2,6 +2,7 @@ package com.pinyougou.shop.controller;
 
 import com.pinyougou.common.FastDFSClient;
 import com.pinyougou.entity.Result;
+import org.csource.fastdfs.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,4 +30,7 @@ public class UploadController {
         }
 
     }
+
+
+
 }

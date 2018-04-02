@@ -65,6 +65,8 @@ public class BrandController {
 	@RequestMapping("/dele")
 	public Result dele(Long[] ids){
 		try {
+			System.out.println(11);
+			System.out.println(ids);
 			brandService.dele(ids);
 			return new Result(true,"删除成功");
 		}catch (Exception e){
@@ -75,8 +77,6 @@ public class BrandController {
 
 	@RequestMapping("/search")
 	public PageResult search(@RequestBody TbBrand tbBrand,int page,int rows){
-		System.out.println(page);
-		System.out.println(rows);
 		return brandService.findPage(tbBrand,page,rows);
 	}
 
